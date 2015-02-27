@@ -103,11 +103,15 @@ module Prmd
       elsif value.key?('items') # array of objects
         _, items = dereference(value['items'])
         if value['items'].key?('example')
-          if items["example"].is_a?(Array)
-            items["example"]
-          else
-            [items['example']]
+          [items['example']]
+        elsif value['items'].key?('anyOf')
+          result = []
+          value['items']['anyOf'].each do |schema|
+            _, dff_schema = dereference(schema)
+            example = schema_value_example(dff_schema)
+            result << example
           end
+          result
         else
           [schema_example(items)]
         end
